@@ -65,31 +65,36 @@ def listenForClients():
         destHost = sys.argv[3]
         destPort = int(sys.argv[4])
         mainSock.bind((ip, sourcePort))
-        mainSock.listen(5)
-        clientSock = mainSock.accept()[0]
-        while True:            
+        mainSock.listen(5)       
+        while True:  
+            clientSock = mainSock.accept()[0]          
             servSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             servSock.connect((destHost,destPort))
             thread.start_new_thread(sendInfo, (clientSock, servSock))
             thread.start_new_thread(sendInfo, (servSock, clientSock))
-    except Exception, e:
-            print("Exception e =  " + str(e))
+    #except Exception, e:
+            #print("Exception e =  " + str(e))
              #clientSock.send(bytearray(str(e)+'\n', "ascii"))
-   # finally:
-        #thread.start_new_thread(listenForClients,()) 
+    finally:
+        thread.start_new_thread(listenForClients,()) 
        
 
 def sendInfo(sourceSocket, destinationSocket):
-    data = 1 
-    while data:
-        data = sourceSocket.recv(BUFFER_SIZE)
-        if(data):
-            destinationSocket.sendall(data)
-        else:
-            #data = 0;
-            sourceSocket.shutdown(socket.SHUT_RD)
-            destinationSocket.shutdown(socket.SHUT_WR)
-
+    
+    data1 = ''
+    while 1:
+        print("Line 117")
+        servResp = sourceSocket.recv(BUFFER_SIZE)
+        print("Line 118")
+        #data1 += servResp
+        print("resp: " + servResp)
+        destinationSocket.send(servResp)
+        print("Line 119")
+        if not servResp:
+            break
+    #sourceSocket.shutdown(socket.SHUT_RD)
+    #destinationSocket.shutdown(socket.SHUT_WR)
+    
     
     
 

@@ -7,7 +7,7 @@
 
 import socket
 import sys
-import threading
+import thread
 import time
 import socket               
 import subprocess
@@ -60,101 +60,85 @@ def main():
         #send response message to client
 
 def listenForClients():
+   #ip = 'localhost'
    ip = get_ip()
    #print("ip: " + ip)
+  
+   cSock = socket.socket()             # Create a socket object
+   cSock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # to make sure the connection doesn't hang   
+        
+   destHost = sys.argv[3]
+   server_address = destHost      
+   sourcePort = int(sys.argv[2]) 
+   destPort = int(sys.argv[4])     # Reserve a port for your service.     
+   cSock.bind((ip, sourcePort))            # Bind to the port  
    while True:
-       cSock = socket.socket()             # Create a socket object
-       cSock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # to make sure the connection doesn't hang   
+      print("Listening")  
+      cSock.listen(5) # Now wait for client connection.                                
+      cli, addr = cSock.accept()        # Establish connection with client.
+      sSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
+      conInfo = (destHost,destPort)   
+      thread.start_new_thread(sSock.connect(),(conInfo))
+      #cli.send(bytearray("Testing12345", 'ascii'))
+      print ('Got connection from', addr)       # 
+      print("Socket Started")
+      try:
+          thread.start_new_thread(listenToClient, (cli,sSock, destHost, destPort))
+          thread.start_new_thread(listenToServer,(cli,sSock, destHost, destPort))
+      except Exception, b:
+          print("Exception b =" + str(b))
+      #finally:
+          #thread.start_new_thread(listenForClients,())       
        
-       #sourceHost = s.getsockname()
-       #sourceHost = sourceHost[0]         # Get local machine ip
-       #print("line 52, sourceHost = " + sourceHost)
-       destHost = sys.argv[3]
-       server_address = destHost
-       #print
-       sourcePort = int(sys.argv[2]) 
-       destPort = int(sys.argv[4])     # Reserve a port for your service.
-       #print("line 51 : " + str(port)) 
-       cSock.bind((ip, sourcePort))            # Bind to the port
-       #print("line 53 : " + str(sourcePort))
-       #testing = s.getsockname()
-       #print(str(testing[0]))       
-       cSock.listen(5)                     # Now wait for client connection.         
-       cli, addr = cSock.accept()        # Establish connection with client.
-       cli.send(bytearray("Testing12345", 'ascii'))
-       print ('Got connection from', addr)
-       #print("line 51 : " + str(port))
-       #sSock = socket.socket()  
-       print("Socket Started")
-       #sSock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-       #sSock.connect((destHost,destPort))
-       threading.Thread(listenToClient(cli,destHost, destPort)).start()
-       
-       #print("Line 52")
-
-
 #reference http://stackoverflow.com/questions/23828264/how-to-make-a-simple-multithreaded-socket-server-in-python-that-remembers-client
-def listenToClient(client,destHost,destPort):
-    cont = True    
-    print("Socket Started")        
-    sSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    #sSock.connect((destHost,destPort))
-    sSock.connect((destHost,destPort))
-    #sSock.setblocking(0)
+def listenToClient(client,sSock,destHost,destPort):
+    cont = True   
     while cont:       
         try:                        
             data = client.recv(BUFFER_SIZE)
             while (len(data) == BUFFER_SIZE):
-                data += client.recv(BUFFER_SIZE)
-           #data = data.decode("ascii")
-            if(data == ''):
-                #print("Client Closed")
+                data += client.recv(BUFFER_SIZE)           
+            if(data == ''):                
+                client.close()            
+            print(data)            
+            sSock.send(data)
+            #data1 = ''
+            print("Line 106")                   
+        except socket.error as t:
+            if t.errno == errno.EPIPE:
+                print("Client Closed")
+                cont = False
+                client.send(bytearray("Broken Pipe"))
                 client.close()
-            #client.send(data)            
-            sSock.sendall(data)
-            data1 = ''
-            print("Line 106")
-            while 1:
-				print("Line 117")
-				servResp = sSock.recv(BUFFER_SIZE)
-				print("Line 118")
-				data1 += servResp
-				print("Line 119")
-				if not servResp:
-					break				
-            #sSock.sendto(data,(destHost,destPort))
-            #servResp = sSock.recv(BUFFER_SIZE)
-            #if(servResp != ""):
-                #sSock.connect((destHost,destPort))
-				#data1 = servResp
-				#while(len(servResp) == BUFFER_SIZE):
-					#servResp = sSock.recv(BUFFER_SIZE)
-					#data1 += servResp
-                #sSock.recv(BUFFER_SIZE)
-            #print("Serv RespG: " + servResp)
-            #while(len(servResp) == BUFFER_SIZE):
-            #    servResp += serv.recv(BUFFER_SIZE,0)            
-            client.send(data1)
-            sSock.shutdown(socket.SHUT_RDWR)
-            sSock.close()
-            sSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sSock.connect((destHost,destPort))
-            #sSock.setblocking(0)
-            #print("Line 72")
-            #data = data.decode('ascii')
-            #print(data)
-        #except socket.error as t:
-           # if t.errno == errno.EPIPE:
-             #   print("Client Closed")
-              #  cont = False
-               # client.send(bytearray("Broken Pipe"))
-                #client.close()
-        except Exception as e:
-             print("Exception e =  " + str(e))
-             client.send(bytearray(str(e)+'\n', "ascii"))
+        #except Exception as e:
+             #print("Exception e =  " + str(e))
+             #client.send(bytearray(str(e)+'\n', "ascii"))
        
              
     client.close()
+    
+def listenToServer(client,sSock,destHost,destPort):
+    cont = True         
+    while cont:       
+        try:                    
+           #print("Line 141")
+            while 1:
+                #print("Line 143")
+                #sSock.listen(1)
+                servResp = sSock.recv(BUFFER_SIZE)
+                client.send(servResp)                
+                if not servResp:
+                    break                    
+        except socket.error as t:
+            if t.errno == errno.EPIPE:
+                print("Server Closed")
+                cont = False
+                sSock.send(bytearray("Broken Pipe"))
+                sSock.close()
+        #except Exception as e:
+             #print("Exception e =  " + str(e))
+             #client.send(bytearray(str(e)+'\n', "ascii"))          
+    sSock.close()
 
 def testClient():
     host = sys.argv[3]
