@@ -80,7 +80,8 @@ def main():
 
 def listenForClients():
    #ip = 'localhost'
-   ip = get_ip()
+   #ip = get_ip()
+   ip = '10.13.168.192'
    #print("ip: " + ip)  
    cSock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)             # Create a socket object
    cSock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # to make sure the connection doesn't hang   
@@ -88,24 +89,26 @@ def listenForClients():
    sourcePort = int(sys.argv[2]) 
    destPort = int(sys.argv[4])     # Reserve a port for your service.     
    cSock.bind((ip, sourcePort))            # Bind to the port
-   sSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-   sSock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR,1)
-   sSock.bind((destHost,destPort))
+   cSock.listen(5) # Now wait for client connection.                                
         
    while True:
       print("Listening")  
-      cSock.listen(5) # Now wait for client connection.                                
       cli, addr = cSock.accept()       # Establish connection with client.          
+      sSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+      sSock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR,1)
+      sSock.connect((destHost,destPort))
       print ('Got connection from', addr)       # 
       print("Socket Started")
       try:
          ClientThread(cli, (ip, sourcePort),sSock).start()
          ClientThread(sSock, (destHost,destPort),cli).start()
       except Exception, b:
-          print("Exception b =" + str(b))             
+          print("Exception b =" + str(b))
+          sSock.close()
+          break             
       #finally:
-		#  thread.start_new_thread(listenForClients,()) 
-		
+        #  thread.start_new_thread(listenForClients,()) 
+        
 
 
 
