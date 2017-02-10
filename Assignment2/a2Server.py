@@ -76,9 +76,9 @@ def listenForClients():
       print("Listening")  
       cSock.listen(5) # Now wait for client connection.                                
       cli, addr = cSock.accept()        # Establish connection with client.
-      sSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
-      conInfo = (destHost,destPort)   
-      thread.start_new_thread(sSock.connect(),(conInfo))
+      sSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+      sSock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)        
+      sSock.connect((destHost,destPort) )
       #cli.send(bytearray("Testing12345", 'ascii'))
       print ('Got connection from', addr)       # 
       print("Socket Started")
@@ -122,13 +122,16 @@ def listenToServer(client,sSock,destHost,destPort):
     while cont:       
         try:                    
            #print("Line 141")
+            data = ''
             while 1:
                 #print("Line 143")
                 #sSock.listen(1)
                 servResp = sSock.recv(BUFFER_SIZE)
+                #data += servResp
                 client.send(servResp)                
                 if not servResp:
-                    break                    
+                    break
+            client.send(data)                    
         except socket.error as t:
             if t.errno == errno.EPIPE:
                 print("Server Closed")
@@ -154,7 +157,6 @@ def testClient():
     c.close()
 if __name__ == '__main__':
     main()
-
 
 
 
