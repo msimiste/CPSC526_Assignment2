@@ -47,29 +47,39 @@ def get_ip():
 class ClientThread ( threading.Thread):
 
    # Override Thread's __init__ method to accept the parameters needed:
-   def __init__ ( self, channel, details, receiver ):
+   def __init__ ( self, channel, details, receiver, threads ):
 
       self.channel = channel
       self.details = details
       self.receiver = receiver
+      self.threads = threads
       threading.Thread.__init__ ( self )
 
    def run ( self ):
         cont = True
         print(self.details)
-        while cont:       
-                try:                        
-                    while 1:
-                        servResp = self.channel.recv(BUFFER_SIZE)
-                        self.receiver.send(servResp)      
-                        if not servResp:
-                            break                   
-                except socket.error as t:
-                    if t.errno == errno.EPIPE:
-                        print("Client Closed")
-                        cont = False
-                        self.receiver.send(bytearray("Broken Pipe"))
-                        self.receiver.close()
+        try:
+            while cont:                                     
+                servResp = self.channel.recv(BUFFER_SIZE)
+                self.receiver.send(servResp)      
+                if not servResp:
+                    print(str(self.details) + ": line 66")
+                    #self.receiver.send('')
+                    self.receiver.close()
+                    self.channel.close()
+                    #self.receiver.join()
+                    for t in self.threads[1:]:
+                        t.join()
+                    cont = False                    
+                    # Exception('You need to enter a value')                                      
+        except socket.error as t:
+            if t.errno == errno.EPIPE:
+                print("Client Closed")
+                cont = False
+                self.receiver.send(bytearray("Broken Pipe"))
+                #self.receiver.close()
+                #self.channel.close()
+                        
    
 def main():
     #print(' '.join(str(x) for(x) in (sys.argv[1:])))
@@ -80,32 +90,39 @@ def main():
 
 def listenForClients():
    #ip = 'localhost'
-   #ip = get_ip()
-   ip = '10.13.168.192'
+   ip = get_ip()
+   #ip = '10.13.168.192'
    #print("ip: " + ip)  
    cSock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)             # Create a socket object
    cSock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # to make sure the connection doesn't hang   
    destHost = sys.argv[3]         
    sourcePort = int(sys.argv[2]) 
    destPort = int(sys.argv[4])     # Reserve a port for your service.     
-   cSock.bind((ip, sourcePort))            # Bind to the port
+   cSock.bind(('', sourcePort))            # Bind to the port
    cSock.listen(5) # Now wait for client connection.                                
-        
+   threads = []    
    while True:
       print("Listening")  
-      cli, addr = cSock.accept()       # Establish connection with client.          
+      cli, addr = cSock.accept()       # Establish connection with client. 
+      print("line106")         
       sSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-      sSock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR,1)
+      print("line108")
+      #sSock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR,1)
       sSock.connect((destHost,destPort))
+      sSock.send('')
       print ('Got connection from', addr)       # 
-      print("Socket Started")
+      print("Socket Started")      
       try:
-         ClientThread(cli, (ip, sourcePort),sSock).start()
-         ClientThread(sSock, (destHost,destPort),cli).start()
-      except Exception, b:
+         cThread = ClientThread(cli, (ip, sourcePort),sSock, threads)
+         cThread.start()
+         threads.append(cThread)
+         sThread = ClientThread(sSock, (destHost,destPort),cli, threads)
+         sThread.start()
+         threads.append(sThread)
+      except Exception as b:
           print("Exception b =" + str(b))
           sSock.close()
-          break             
+          #break             
       #finally:
         #  thread.start_new_thread(listenForClients,()) 
         
