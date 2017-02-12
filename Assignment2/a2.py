@@ -133,7 +133,7 @@ def logging(inputVal, prefix):
         temp = zip(test,merged2)
         #print(temp)
         for h,t in zip(test,merged2):
-          	print ' '.join(h[0][0:][0:]),'|',(t),'|'
+          	print ' '.join(h[0][0:][0:]),' ',' '.join(h[1][0:][0:]), '|',(t),'|'
             #print('|')
             #print(merged[i])
             #print('|\n')
