@@ -103,7 +103,7 @@ def logging(inputVal, prefix):
     #print logged
     
     #logged  = map(lambda c: hex(ord(c)),inputVal)
-    #print type(logged)
+    #print type(logged')
     #logged[0] = '---->' + logged[0]
     #print (prefix + logged[0] + '\n')
     #temp = prefix.join((x) for x in logged )
@@ -114,14 +114,46 @@ def logging(inputVal, prefix):
     #print("strip = : "+ str(STRIP))
     #print("auton = : "+ str(AUTON))
     if(RAW):
-        merged = inputToOrds(prefix,inputVal)        
+        pre = prefixToOrds(prefix)
+        merged = inputToOrds(pre,inputVal) 
+        merged = _raw(pre,merged)
         print(merged)
     elif(HEX):
-        print type("Logging: 109")
-        print type(inputVal)        
+        #merged = map(lambda c: hex(ord(c)),inputVal)
+        #merged = ' '.join(x[2:] for x in merged)
+        #merged = re.findall('........', inputVal)
+        merged = [inputVal[i:i+8]  for i in range(0, len(inputVal), 8)]
+        merged2 = [inputVal[i:i+16]  for i in range(0, len(inputVal), 16)]
+        hexed =  map(lambda h: convertHex(h), merged)
+        #test = map(lambda h: h + '  ' , hexed)   
+        #merged2 = map(lambda h: '|'+ h + '|' , merged2)
+        #merged = map(lambda g: merged[g] + merged[g+1], merged)
+       # merged = [merged[i:i+2] for i in range(0, len(merged), 2)]         
+        test =   [hexed[i:i+2] for i in range(0, len(hexed), 2)] 
+        temp = zip(test,merged2)
+        #print(temp)
+        for h,t in zip(test,merged2):
+          	print(' '.join(h[0][0:][0:]),'|',(t),'|')
+            #print('|')
+            #print(merged[i])
+            #print('|\n')
+        #test = [test[i]  merged[i] for i in range(0,len(test), 1)]
+        #test  =  [merged.insert(i,'  ') for i in range(1, len(merged), 1)]
+        #hexed = [hexed[i:i+2] for i in range(0,len(hexed),2)]
+        #hexed = map(lambda x: (x[0] + x[1]), hexed)
+        #testing = _HexDmp(hexed,merged)
+        #print(merged2)
+        #print(hexed)
+        #print /H("Logging: 109")
+        #print type(inputVal)        
     elif(STRIP):
-        print type("Logging: 112")
-        print type(inputVal)        
+        #print type("Logging: 112")
+        pre = prefixToOrds(prefix)
+        merged = inputToOrds(pre,inputVal)
+        merged = _Strip(pre,merged) 
+        #question for TA, do we want to include newline chars?
+        merged = merged.replace('.', '.\n')
+        #print (merged)         
     elif(AUTON):
         print type(inputVal)
         print type("Logging: 116")  
@@ -131,18 +163,48 @@ def logging(inputVal, prefix):
 
 def inputToOrds(prefix,inputVal):
     rawLog = map(lambda c: ord(c), inputVal)
-    pre = map(lambda c: ord(c), prefix)
-    merged = pre + rawLog
-    merged = _raw(pre,merged)
-    return merged    
+    #pre = prefixToOrds(prefix)
+    merged = prefix + rawLog    
+    return merged
+
+def prefixToOrds(prefix):
+    pre = map(lambda c: ord(c), prefix) 
+    return pre
+             
 def _raw(prefix,inVal):
     outVal = insertPrefix(inVal,prefix)
     outVal = ''.join(str(chr(x)) for x in outVal)
     return outVal
 
-#def _Strip():
-    
-#def _HexDmp():
+def _Strip(prefix,inVal):
+    outVal = insertPrefix(inVal,prefix)
+    outVal = ''.join(str(chr(convertPrintable(x))) for x in outVal)
+    return outVal
+
+def convertPrintable(inOrd):
+    if((inOrd < 32) or(inOrd > 127)):
+        return  46
+    else:
+        return inOrd
+    #elif(inOrd > 127)
+    #   return 46
+def convertHex(inVal):
+    merged = map(lambda c: hex(ord(c))[2:],inVal)
+    for x,v in enumerate(merged):
+	   if len(v) < 2:
+		  merged[x] = '0' + v
+    #print(merged)
+    #outVal = ' '.join(x[2:] for x in merged)
+    return merged       
+
+def _HexDmp(list1, list2):
+    n = 2
+    #hexList = [list1[i:i+n] for i in range(0, len(list1), n)]
+    #strList = [list2[i:i+n] for i in range(0, len(list2), n)]
+    #zippedList = zip(hexList,strList)
+    #zippedList = map(lambda x: x[0][0:] + '  ' + x[0][1] + '  |' + x[1][0] + x[1][1] +'|', zippedList)
+    #print(zippedList)
+    #return output
 
 #def autoN():
 
@@ -183,8 +245,8 @@ def setParseParams():
         elif(str(arg).upper()[0:6] == _STRIP_.upper()):
             print("parse 113" + str(arg))
             print(arg[0:6])
-            global  _STRIPI
-            _STRIP = True
+            global  STRIP
+            STRIP = True
         #else:
             #raise Exception("Bad Flag Choice")
     except Exception as e:
