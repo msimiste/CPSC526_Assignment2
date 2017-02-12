@@ -125,15 +125,16 @@ def logging(inputVal, prefix):
         merged = [inputVal[i:i+8]  for i in range(0, len(inputVal), 8)]
         merged2 = [inputVal[i:i+16]  for i in range(0, len(inputVal), 16)]
         hexed =  map(lambda h: convertHex(h), merged)
+        hexed2 = map(lambda h: convertHex(h), merged2)
         #test = map(lambda h: h + '  ' , hexed)   
         #merged2 = map(lambda h: '|'+ h + '|' , merged2)
         #merged = map(lambda g: merged[g] + merged[g+1], merged)
        # merged = [merged[i:i+2] for i in range(0, len(merged), 2)]         
         test =   [hexed[i:i+2] for i in range(0, len(hexed), 2)] 
-        temp = zip(test,merged2)
+        temp = zip(hexed2,merged2)
         #print(temp)
-        for h,t in zip(test,merged2):
-          	print ' '.join(h[0][0:][0:]),' ',' '.join(h[1][0:][0:]), '|',(t),'|'
+        for h,t in zip(hexed2,merged2):
+          	print ' '.join(h[0:]),' ', '|',(t),'|'
             #print('|')
             #print(merged[i])
             #print('|\n')
