@@ -114,14 +114,8 @@ def logging(inputVal, prefix):
     #print("strip = : "+ str(STRIP))
     #print("auton = : "+ str(AUTON))
     if(RAW):
-        rawLog = map(lambda c: ord(c), inputVal)
-        pre = map(lambda c: ord(c), prefix)
-        merged = pre + rawLog
-        merged = _raw(pre,merged)
-        #logged = merged #
+        merged = inputToOrds(prefix,inputVal)        
         print(merged)
-        test = 3
-        #logged.replace('HTTP','\n---->')    
     elif(HEX):
         print type("Logging: 109")
         print type(inputVal)        
@@ -134,7 +128,13 @@ def logging(inputVal, prefix):
     #else:
        # raise Exception("Logging Format Error no value given")
     #return logged
-    
+
+def inputToOrds(prefix,inputVal):
+    rawLog = map(lambda c: ord(c), inputVal)
+    pre = map(lambda c: ord(c), prefix)
+    merged = pre + rawLog
+    merged = _raw(pre,merged)
+    return merged    
 def _raw(prefix,inVal):
     outVal = insertPrefix(inVal,prefix)
     outVal = ''.join(str(chr(x)) for x in outVal)
