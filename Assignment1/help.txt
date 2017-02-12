@@ -1,0 +1,12 @@
+	Commands
+cat <file> 	 display a file
+cd 		 change current working directory
+end 		 closes the connection on client side without shutting down the server
+help 		 shows a list of commands
+ls [agrs] 	 list current directory contents
+off 		 shuts down the program
+who 		 lists the users who are currently logged in
+ps 		 shows the current running processes
+pwd 		 returns the current working directory
+who 		 lists the users currently logged in
+***NOTE*** 	This program will execute all linux commands
