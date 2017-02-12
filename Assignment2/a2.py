@@ -126,6 +126,7 @@ def logging(inputVal, prefix):
         merged2 = [inputVal[i:i+16]  for i in range(0, len(inputVal), 16)]
         hexed =  map(lambda h: convertHex(h), merged)
         hexed2 = map(lambda h: convertHex(h), merged2)
+        merged2 = map(lambda h: str.replace(h,'\n',''), merged2)
         #test = map(lambda h: h + '  ' , hexed)   
         #merged2 = map(lambda h: '|'+ h + '|' , merged2)
         #merged = map(lambda g: merged[g] + merged[g+1], merged)
@@ -134,7 +135,7 @@ def logging(inputVal, prefix):
         temp = zip(hexed2,merged2)
         #print(temp)
         for h,t in zip(hexed2,merged2):
-          	print ' '.join(h[0:]),' ', '|',(t),'|'
+            print ' '.join(h[0:]),' ', '|',(t),'|'
             #print('|')
             #print(merged[i])
             #print('|\n')
@@ -192,8 +193,8 @@ def convertPrintable(inOrd):
 def convertHex(inVal):
     merged = map(lambda c: hex(ord(c))[2:],inVal)
     for x,v in enumerate(merged):
-	   if len(v) < 2:
-		  merged[x] = '0' + v
+       if len(v) < 2:
+          merged[x] = '0' + v
     #print(merged)
     #outVal = ' '.join(x[2:] for x in merged)
     return merged       
