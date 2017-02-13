@@ -113,7 +113,6 @@ def logging(inputVal, prefix):
         for h,t in zip(hexed2,merged2):
             print prefix,' '.join(h[0:]),' ', '|'+(t)+'|'                               
     elif(STRIP):
-        print("STRIP line 111")
         pre = prefixToOrds(prefix)
         merged = inputToOrds(pre,inputVal)
         merged = _Strip(pre,merged)
@@ -186,37 +185,24 @@ def insertPrefix(inputList, prefix):
     return inputList 
     
 def setParseParams():
-    print("line 128")
+    
     try:
-        arg = sys.argv[1] 
-        print("Argv: " + str(arg))
-        print(str(str(arg).upper()[0:4] == HEX_STR.upper()))
-        print(str(arg).upper()[0:4])
-        print(HEX_STR.upper())  
-        if (str(arg).upper()[0:4] == HEX_STR.upper()):
-            print("parse 106" + str(arg))
+        arg = sys.argv[1]         
+        if (str(arg).upper()[0:4] == HEX_STR.upper()):           
             print(arg[0:4])
             global HEX
             HEX = True
-        elif(str(arg).upper()[0:4] == '-raw'.upper()):
-            print("parse 141" + str(arg))
+        elif(str(arg).upper()[0:4] == '-raw'.upper()):            
             global RAW 
             RAW = True
-        elif (str(arg).upper()[0:5] == _AUTO_N.upper()):
-            print("parse 109" + str(arg))
-            print(arg[0:5])
+        elif (str(arg).upper()[0:5] == _AUTO_N.upper()):            
             global AUTON
             AUTON = True
             global N_VALUE
-            N_VALUE = int(arg[5:]) 
-            print("NVAL = " + str(N_VALUE))         
-        elif(str(arg).upper()[0:6] == _STRIP_.upper()):
-            print("parse 113" + str(arg))
-            print(arg[0:6])
+            N_VALUE = int(arg[5:])                    
+        elif(str(arg).upper()[0:6] == _STRIP_.upper()):           
             global  STRIP
-            STRIP = True
-        #else:
-            #raise Exception("Bad Flag Choice")
+            STRIP = True        
     except Exception as e:
         print("Exception: " + str(e))   
 
@@ -237,14 +223,12 @@ def listenForClients():
     threads = []    
     while True:
         print("Listening")  
-        cli, addr = cSock.accept()       # Establish connection with client. 
-        print("line106")         
-        sSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        print("line108")
+        cli, addr = cSock.accept()       # Establish connection with client.             
+        sSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)        
         sSock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR,1)
         sSock.connect((destHost,destPort))
         sSock.send('')
-        print ('Got connection from', addr)       # 
+        print 'Got connection from '+ str(addr) +' ' +time.strftime("%c")    # 
         print("Socket Started")      
         try:
             cThread = ClientThread(cli, (ip, sourcePort),sSock, threads,'---->')
