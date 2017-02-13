@@ -70,15 +70,13 @@ class ClientThread ( threading.Thread):
         try:
             while cont:                                     
                 servResp = self.channel.recv(BUFFER_SIZE)
-                #servResp = 
                 self.receiver.send(servResp)
                 logging(servResp, self.prefix)
-                #print(logged)      
                 if not servResp:
                     print(str(self.details) + ": line 66")
                     self.receiver.close()
                     self.channel.close()
-                    #os.unlink(self.details[1])
+                    
                     cont = False                    
                                                           
         except socket.error as t:
@@ -86,100 +84,46 @@ class ClientThread ( threading.Thread):
                 print("Client Closed")
                 cont = False
                 self.receiver.send(bytearray("Broken Pipe"))
-                #self.receiver.close()
-                #self.channel.close()
                         
-   
 def main():
-    #print(' '.join(str(x) for(x) in (sys.argv[1:])))
-    #greeting()
-    #testClient()
     setParseParams()
     print("line97")
     listenForClients()    
 
 def logging(inputVal, prefix):
-    #logged = inputVal.split('\n')
-    #print logged
-    
-    #logged  = map(lambda c: hex(ord(c)),inputVal)
-    #print type(logged')
-    #logged[0] = '---->' + logged[0]
-    #print (prefix + logged[0] + '\n')
-    #temp = prefix.join((x) for x in logged )
-    #temp = prefix + temp
-    #print temp
-    #print("Raw = : "+ str(RAW))
-    #print("Hex = : "+ str(HEX))
-    #print("strip = : "+ str(STRIP))
-    #print("auton = : "+ str(AUTON))
     if(RAW):
         pre = prefixToOrds(prefix)
         merged = inputToOrds(pre,inputVal) 
         merged = _raw(pre,merged)
         print(merged)
     elif(HEX):
-        #merged = map(lambda c: hex(ord(c)),inputVal)
-        #merged = ' '.join(x[2:] for x in merged)
-        #merged = re.findall('........', inputVal)
         merged = [inputVal[i:i+8]  for i in range(0, len(inputVal), 8)]
         merged2 = [inputVal[i:i+16]  for i in range(0, len(inputVal), 16)]
         hexed =  map(lambda h: convertHex(h), merged)
         hexed2 = map(lambda h: convertHex(h), merged2)
-        merged2 = map(lambda h: str.replace(h,'\n','.'), merged2)
-        #test = map(lambda h: h + '  ' , hexed)   
-        #merged2 = map(lambda h: '|'+ h + '|' , merged2)
-        #merged = map(lambda g: merged[g] + merged[g+1], merged)
-       # merged = [merged[i:i+2] for i in range(0, len(merged), 2)]         
+        merged2 = map(lambda h: str.replace(h,'\n','.'), merged2)        
         test =   [hexed[i:i+2] for i in range(0, len(hexed), 2)] 
         temp = zip(hexed2,merged2)
-        #print(temp)
         for h,t in zip(hexed2,merged2):
-            print prefix,' '.join(h[0:]),' ', '|'+(t)+'|'
-            #print('|')
-            #print(merged[i])
-            #print('|\n')
-        #test = [test[i]  merged[i] for i in range(0,len(test), 1)]
-        #test  =  [merged.insert(i,'  ') for i in range(1, len(merged), 1)]
-        #hexed = [hexed[i:i+2] for i in range(0,len(hexed),2)]
-        #hexed = map(lambda x: (x[0] + x[1]), hexed)
-        #testing = _HexDmp(hexed,merged)
-        #print(merged2)
-        #print(hexed)
-        #print /H("Logging: 109")
-        #print type(inputVal)        
+            print prefix,' '.join(h[0:]),' ', '|'+(t)+'|'                               
     elif(STRIP):
-        #print type("Logging: 112")
+        print("STRIP line 111")
         pre = prefixToOrds(prefix)
         merged = inputToOrds(pre,inputVal)
-        merged = _Strip(pre,merged) 
-        #question for TA, do we want to include newline chars?
+        merged = _Strip(pre,merged)
         merged = merged.replace('.', '.\n')
-        #print (merged)         
-    elif(AUTON):
-       #print("Logging: 160")
-        #print("N_VALUE: " + str(N_VALUE))
+        print(merged)                
+    elif(AUTON):       
         pre = prefixToOrds(prefix)
         merged = inputToOrds(pre,inputVal)
         autoLen = N_VALUE + len(prefix)
         pre = map(lambda x: autoN(x), prefix)
         merged = map(lambda x: autoN(x),inputVal)
         merged = pre + merged
-        #merged = [merged[i:i+N_VALUE] for i in range(0, len(merged), N_VALUE)]
-        #merged = ' '.join(merged[0:][0:])
-        print ("\n"+prefix).join([''.join(merged[i:i+autoLen]) for i in xrange(0,len(merged),autoLen)])
-        #print ''.join(c if c in printable else r'\x{0:02x}'.format(ord(c)) for c in merged)
-        #print ''.join(merged[0:])
-        #print(merged)
-        #print type(inputVal)
-        #print type("Logging: 116")  
-    #else:
-       # raise Exception("Logging Format Error no value given")
-    #return logged
-
+        print ("\n"+prefix).join([''.join(merged[i:i+N_VALUE]) for i in xrange(0,len(merged),N_VALUE)])
+        
 def inputToOrds(prefix,inputVal):
     rawLog = map(lambda c: ord(c), inputVal)
-    #pre = prefixToOrds(prefix)
     merged = prefix + rawLog    
     return merged
 
@@ -202,25 +146,13 @@ def convertPrintable(inOrd):
         return  46
     else:
         return inOrd
-    #elif(inOrd > 127)
-    #   return 46
+            
 def convertHex(inVal):
     merged = map(lambda c: hex(ord(c))[2:],inVal)
     for x,v in enumerate(merged):
        if len(v) < 2:
           merged[x] = '0' + v
-    #print(merged)
-    #outVal = ' '.join(x[2:] for x in merged)
     return merged       
-
-def _HexDmp(list1, list2):
-    n = 2
-    #hexList = [list1[i:i+n] for i in range(0, len(list1), n)]
-    #strList = [list2[i:i+n] for i in range(0, len(list2), n)]
-    #zippedList = zip(hexList,strList)
-    #zippedList = map(lambda x: x[0][0:] + '  ' + x[0][1] + '  |' + x[1][0] + x[1][1] +'|', zippedList)
-    #print(zippedList)
-    #return output
 
 def autoN(char):
     tempChar = ord(char)
@@ -283,10 +215,7 @@ def setParseParams():
         print("Exception: " + str(e))   
 
 def listenForClients():
-   ip = 'localhost'
-   #ip = get_ip()
-   #ip = '68.145.126.231'
-   #print("ip: " + ip)  
+   ip = 'localhost' 
    cSock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)             # Create a socket object
    cSock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # to make sure the connection doesn't hang   
    if(len(sys.argv) == 5):
@@ -321,9 +250,8 @@ def listenForClients():
       except Exception as b:
           print("Exception b =" + str(b))
           sSock.close()
-          #break             
-      #finally:
-        #  thread.start_new_thread(listenForClients,()) 
+          break             
+      
 
 if __name__ == '__main__':
     main()
