@@ -33,16 +33,16 @@ N_VALUE = ''
 
     
 def greeting():
-	if(len(sys.argv) == 5):
-		print ("Port logger running: " +  sys.argv[1] + \
-		" srcPort= " + sys.argv[2] \
-		 + " Host=" + sys.argv[3] \
-		 + " dstPort=" + sys.argv[4])
-	elif(len(sys.argv) == 4):
-		print ("Port logger running: Logging Disabled" + \
-		" srcPort= " + sys.argv[1] \
-		 + " Host=" + sys.argv[2] \
-		 + " dstPort=" + sys.argv[3])
+    if(len(sys.argv) == 5):
+        print ("Port logger running: " +  sys.argv[1] + \
+        " srcPort= " + sys.argv[2] \
+        + " Host=" + sys.argv[3] \
+        + " dstPort=" + sys.argv[4])
+    elif(len(sys.argv) == 4):
+        print ("Port logger running: Logging Disabled" + \
+        " srcPort= " + sys.argv[1] \
+        + " Host=" + sys.argv[2] \
+        + " dstPort=" + sys.argv[3])
      
 #code for get_ip is modified from ----> http://stackoverflow.com/questions/24196932/how-can-i-get-the-ip-address-of-eth0-in-python
 def get_ip():
@@ -221,42 +221,42 @@ def setParseParams():
         print("Exception: " + str(e))   
 
 def listenForClients():
-   ip = 'localhost' 
-   cSock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)             # Create a socket object
-   cSock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # to make sure the connection doesn't hang   
-   if(len(sys.argv) == 5):
-       destHost = sys.argv[3]         
-       sourcePort = int(sys.argv[2]) 
-       destPort = int(sys.argv[4])     # Reserve a port for your service.     
-   else:
-       destHost = sys.argv[2]         
-       sourcePort = int(sys.argv[1]) 
-       destPort = int(sys.argv[3])       
-   cSock.bind(('', sourcePort))            # Bind to the port
-   cSock.listen(5) # Now wait for client connection.                                
-   threads = []    
-   while True:
-      print("Listening")  
-      cli, addr = cSock.accept()       # Establish connection with client. 
-      print("line106")         
-      sSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-      print("line108")
-      sSock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR,1)
-      sSock.connect((destHost,destPort))
-      sSock.send('')
-      print ('Got connection from', addr)       # 
-      print("Socket Started")      
-      try:
-         cThread = ClientThread(cli, (ip, sourcePort),sSock, threads,'---->')
-         cThread.start()
-         threads.append(cThread)
-         sThread = ClientThread(sSock, (destHost,destPort),cli, threads,'<----')
-         sThread.start()
-         threads.append(sThread)
-      except Exception as b:
-          print("Exception b =" + str(b))
-          sSock.close()
-          break             
+    ip = 'localhost' 
+    cSock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)             # Create a socket object
+    cSock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # to make sure the connection doesn't hang   
+    if(len(sys.argv) == 5):
+        destHost = sys.argv[3]         
+        sourcePort = int(sys.argv[2]) 
+        destPort = int(sys.argv[4])     # Reserve a port for your service.     
+    else:
+        destHost = sys.argv[2]         
+        sourcePort = int(sys.argv[1]) 
+        destPort = int(sys.argv[3])       
+    cSock.bind(('', sourcePort))            # Bind to the port
+    cSock.listen(5) # Now wait for client connection.                                
+    threads = []    
+    while True:
+        print("Listening")  
+        cli, addr = cSock.accept()       # Establish connection with client. 
+        print("line106")         
+        sSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        print("line108")
+        sSock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR,1)
+        sSock.connect((destHost,destPort))
+        sSock.send('')
+        print ('Got connection from', addr)       # 
+        print("Socket Started")      
+        try:
+            cThread = ClientThread(cli, (ip, sourcePort),sSock, threads,'---->')
+            cThread.start()
+            threads.append(cThread)
+            sThread = ClientThread(sSock, (destHost,destPort),cli, threads,'<----')
+            sThread.start()
+            threads.append(sThread)
+        except Exception as b:
+            print("Exception b =" + str(b))
+            sSock.close()
+            break             
       
 
 if __name__ == '__main__':
