@@ -157,8 +157,22 @@ def logging(inputVal, prefix):
         merged = merged.replace('.', '.\n')
         #print (merged)         
     elif(AUTON):
-        print type(inputVal)
-        print type("Logging: 116")  
+        print("Logging: 160")
+        print("N_VALUE: " + str(N_VALUE))
+        pre = prefixToOrds(prefix)
+        merged = inputToOrds(pre,inputVal) 
+        merged = _raw(pre,merged)
+        pre = map(lambda x: autoN(x), prefix)
+        test = map(lambda x: autoN(x),inputVal)
+        merged = pre + test
+        #merged = [merged[i:i+N_VALUE] for i in range(0, len(merged), N_VALUE)]
+        #merged = ' '.join(merged[0:][0:])
+        print "\n".join([''.join(merged[i:i+N_VALUE]) for i in xrange(0,len(merged),N_VALUE)])
+        #print ''.join(c if c in printable else r'\x{0:02x}'.format(ord(c)) for c in merged)
+        #print ''.join(merged[0:])
+        #print(merged)
+        #print type(inputVal)
+        #print type("Logging: 116")  
     #else:
        # raise Exception("Logging Format Error no value given")
     #return logged
@@ -208,7 +222,21 @@ def _HexDmp(list1, list2):
     #print(zippedList)
     #return output
 
-#def autoN():
+def autoN(char):
+	tempChar = ord(char)
+	if(tempChar < 32) or (tempChar > 127):
+		if(tempChar == 9):
+			return repr(chr(tempChar))
+		elif(tempChar == 10):
+			return repr(chr(tempChar))
+		elif(tempChar == 13):
+			return repr(chr(tempChar))
+		else:
+			return  '\\' + str(format(tempChar,'02x'))
+	elif(tempChar == 92):
+		return str(chr(92))
+	else:
+		return char
 
 def insertPrefix(inputList, prefix):
     prefix.reverse()
@@ -284,10 +312,10 @@ def listenForClients():
       print ('Got connection from', addr)       # 
       print("Socket Started")      
       try:
-         cThread = ClientThread(cli, (ip, sourcePort),sSock, threads, '<----')
+         cThread = ClientThread(cli, (ip, sourcePort),sSock, threads,'---->')
          cThread.start()
          threads.append(cThread)
-         sThread = ClientThread(sSock, (destHost,destPort),cli, threads,'---->')
+         sThread = ClientThread(sSock, (destHost,destPort),cli, threads,'<----')
          sThread.start()
          threads.append(sThread)
       except Exception as b:
