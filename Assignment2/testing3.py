@@ -7,7 +7,7 @@ def main(args):
     testNewline = chr(10)
     testReturn = chr(13)
     
-    testStr = '    a' 
+    testStr = '    a\\' 
     #=[testSlash,testTab,testNewline,testReturn, chr(15)]
     print ' '.join(hex(ord(x)) for x in (testStr))
     out = map(lambda d: joiner(d), testStr)
@@ -24,9 +24,9 @@ def joiner(char):
         elif(tempChar == 13):
             return repr(chr(tempChar))
         else:
-            return  '\\' + str(hex(tempChar))
+            return  '\\' + format(tempChar, '02x')
     elif(tempChar == 92):
-        return chr(92)
+        return repr(chr(92))
     else:
         return char
 if __name__ == '__main__':

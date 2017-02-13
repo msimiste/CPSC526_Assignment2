@@ -157,17 +157,17 @@ def logging(inputVal, prefix):
         merged = merged.replace('.', '.\n')
         #print (merged)         
     elif(AUTON):
-        print("Logging: 160")
-        print("N_VALUE: " + str(N_VALUE))
+       #print("Logging: 160")
+        #print("N_VALUE: " + str(N_VALUE))
         pre = prefixToOrds(prefix)
-        merged = inputToOrds(pre,inputVal) 
-        merged = _raw(pre,merged)
+        merged = inputToOrds(pre,inputVal)
+        autoLen = N_VALUE + len(prefix)
         pre = map(lambda x: autoN(x), prefix)
-        test = map(lambda x: autoN(x),inputVal)
-        merged = pre + test
+        merged = map(lambda x: autoN(x),inputVal)
+        merged = pre + merged
         #merged = [merged[i:i+N_VALUE] for i in range(0, len(merged), N_VALUE)]
         #merged = ' '.join(merged[0:][0:])
-        print "\n".join([''.join(merged[i:i+N_VALUE]) for i in xrange(0,len(merged),N_VALUE)])
+        print ("\n"+prefix).join([''.join(merged[i:i+autoLen]) for i in xrange(0,len(merged),autoLen)])
         #print ''.join(c if c in printable else r'\x{0:02x}'.format(ord(c)) for c in merged)
         #print ''.join(merged[0:])
         #print(merged)
@@ -223,20 +223,20 @@ def _HexDmp(list1, list2):
     #return output
 
 def autoN(char):
-	tempChar = ord(char)
-	if(tempChar < 32) or (tempChar > 127):
-		if(tempChar == 9):
-			return repr(chr(tempChar))
-		elif(tempChar == 10):
-			return repr(chr(tempChar))
-		elif(tempChar == 13):
-			return repr(chr(tempChar))
-		else:
-			return  '\\' + str(format(tempChar,'02x'))
-	elif(tempChar == 92):
-		return str(chr(92))
-	else:
-		return char
+    tempChar = ord(char)
+    if(tempChar < 32) or (tempChar > 127):
+        if(tempChar == 9):
+            return repr(chr(tempChar))
+        elif(tempChar == 10):
+            return repr(chr(tempChar))
+        elif(tempChar == 13):
+            return repr(chr(tempChar))
+        else:
+            return  '\\' + str(format(tempChar,'02x'))
+    elif(tempChar == 92):
+        return repr(chr(tempChar))
+    else:
+        return char
 
 def insertPrefix(inputList, prefix):
     prefix.reverse()
