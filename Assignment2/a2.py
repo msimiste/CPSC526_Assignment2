@@ -33,10 +33,16 @@ N_VALUE = ''
 
     
 def greeting():
-    print ("Port logger running: " +  sys.argv[1] + \
-    " srcPort= " + sys.argv[2] \
-     + " Host=" + sys.argv[3] \
-     + " dstPort=" + sys.argv[4])
+	if(len(sys.argv) == 5):
+		print ("Port logger running: " +  sys.argv[1] + \
+		" srcPort= " + sys.argv[2] \
+		 + " Host=" + sys.argv[3] \
+		 + " dstPort=" + sys.argv[4])
+	elif(len(sys.argv) == 4):
+		print ("Port logger running: Logging Disabled" + \
+		" srcPort= " + sys.argv[1] \
+		 + " Host=" + sys.argv[2] \
+		 + " dstPort=" + sys.argv[3])
      
 #code for get_ip is modified from ----> http://stackoverflow.com/questions/24196932/how-can-i-get-the-ip-address-of-eth0-in-python
 def get_ip():
@@ -86,8 +92,8 @@ class ClientThread ( threading.Thread):
                 self.receiver.send(bytearray("Broken Pipe"))
                         
 def main():
+    greeting()
     setParseParams()
-    print("line97")
     listenForClients()    
 
 def logging(inputVal, prefix):
