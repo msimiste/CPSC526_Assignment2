@@ -103,15 +103,10 @@ def logging(inputVal, prefix):
         merged = _raw(pre,merged)
         print(merged)
     elif(HEX):
-        merged = [inputVal[i:i+8]  for i in range(0, len(inputVal), 8)]
         merged2 = [inputVal[i:i+16]  for i in range(0, len(inputVal), 16)]
-        hexed =  map(lambda h: convertHex(h), merged)
-        hexed2 = map(lambda h: convertHex(h), merged2)
-        merged2 = map(lambda h: str.replace(h,'\n','.'), merged2)        
-        test =   [hexed[i:i+2] for i in range(0, len(hexed), 2)] 
-        temp = zip(hexed2,merged2)
-        for h,t in zip(hexed2,merged2):
-            print prefix,' '.join(h[0:]),' ', '|'+(t)+'|'                               
+        merged2 = map(lambda h: str.replace(h,'\n','.'), merged2)  
+        for i in merged2:
+            print '{}{:24} |{:16}|'.format(prefix,' '.join([i.encode('hex')[j:j+2] for j in range(0, len(i), 2)]), str(i))                              
     elif(STRIP):
         pre = prefixToOrds(prefix)
         merged = inputToOrds(pre,inputVal)
